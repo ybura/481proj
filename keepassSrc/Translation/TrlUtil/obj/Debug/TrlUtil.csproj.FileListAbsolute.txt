@@ -1,0 +1,8 @@
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.csprojResolveAssemblyReference.cache
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.MainForm.resources
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.Properties.Resources.resources
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.csproj.GenerateResource.Cache
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.exe
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil\obj\Debug\TrlUtil.pdb
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil.exe
+C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Translation\TrlUtil.pdb
