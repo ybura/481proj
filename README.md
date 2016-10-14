@@ -4,6 +4,9 @@ A plug-in for the KeePass password manager, to provide accessibility features fo
 
 ## Getting Started
 
+###Installation
+Build solution in Visual Studio, copy DLL file into Plugins directory of portable Keepass installation. Run Keepass.
+
 TODO: instructions to get project running on local machine.
 
 ## Built With
