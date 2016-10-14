@@ -21,4 +21,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgements
 
+* Thanks to Dr. Chesney and the entire EECS 481 staff for their various help in the project.
 * Thanks to India West for allowing us to consult with her.
