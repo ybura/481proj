@@ -2,9 +2,9 @@
 using KeePass.Plugins;
 using KeePassLib;
 
-namespace KeepassPlugin
+namespace IndiaPlugin
 {
-    public sealed class KeepassPluginExt : Plugin
+    public sealed class IndiaPluginExt : Plugin
     {
         private IPluginHost m_host = null;
 
@@ -22,7 +22,7 @@ namespace KeepassPlugin
             return true;
         }
         public override void Terminate()
-        {   
+        {
         }
     }
 }
