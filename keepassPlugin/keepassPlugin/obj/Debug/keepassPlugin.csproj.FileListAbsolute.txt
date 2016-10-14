@@ -1,7 +1,7 @@
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\bin\Debug\keepassPlugin.dll
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\bin\Debug\keepassPlugin.pdb
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\bin\Debug\KeePass.exe
-C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\bin\Debug\KeePass.pdb
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\obj\Debug\keepassPlugin.csprojResolveAssemblyReference.cache
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\obj\Debug\keepassPlugin.dll
 C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\obj\Debug\keepassPlugin.pdb
+C:\Users\liza\Documents\eecs481\481proj\keepassPlugin\keepassPlugin\bin\Debug\KeePass.XmlSerializers.dll

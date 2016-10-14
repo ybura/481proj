@@ -1,6 +1,0 @@
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Build\KeePassLib\Debug\KeePassLib.xml
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Build\KeePassLib\Debug\KeePassLib.dll
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\Build\KeePassLib\Debug\KeePassLib.pdb
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\KeePassLib\obj\Debug\KeePassLib.csprojResolveAssemblyReference.cache
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\KeePassLib\obj\Debug\KeePassLib.dll
-C:\Users\liza\Documents\eecs481\481proj\keepassSrc\KeePassLib\obj\Debug\KeePassLib.pdb
