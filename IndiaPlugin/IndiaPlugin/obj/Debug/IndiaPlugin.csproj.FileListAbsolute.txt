@@ -4,3 +4,4 @@ C:\Users\liza\Documents\eecs481\481proj\IndiaPlugin\IndiaPlugin\bin\Debug\KeePas
 C:\Users\liza\Documents\eecs481\481proj\IndiaPlugin\IndiaPlugin\bin\Debug\KeePass.XmlSerializers.dll
 C:\Users\liza\Documents\eecs481\481proj\IndiaPlugin\IndiaPlugin\obj\Debug\IndiaPlugin.dll
 C:\Users\liza\Documents\eecs481\481proj\IndiaPlugin\IndiaPlugin\obj\Debug\IndiaPlugin.pdb
+C:\Users\liza\Documents\eecs481\481proj\IndiaPlugin\IndiaPlugin\obj\Debug\IndiaPlugin.csprojResolveAssemblyReference.cache
