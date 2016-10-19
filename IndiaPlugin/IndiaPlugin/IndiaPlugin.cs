@@ -52,6 +52,7 @@ namespace IndiaPlugin
             m_tsmiAddGroups.Text = "Listen to Current Entries";
             m_tsmiAddGroups.Click += SpeakEntriesMenuItem;
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
+            m_tsmiPopup.ShortcutKeys = KeysControl | Keys.P;
             
             return true;
         }
