@@ -19,6 +19,8 @@ namespace IndiaPlugin
         private ToolStripMenuItem m_tsmiAddGroups = null;
         private ToolStripMenuItem m_tsmiAddEntries = null;
 
+        private HotKeyControlEx m_hk = null;
+
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
@@ -52,7 +54,14 @@ namespace IndiaPlugin
             m_tsmiAddGroups.Text = "Listen to Current Entries";
             m_tsmiAddGroups.Click += SpeakEntriesMenuItem;
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
-            m_tsmiPopup.ShortcutKeys = KeysControl | Keys.P;
+            
+            Container ShortcutKeys = KeysControl | Keys.P;
+
+            m_hk = HotKeyControlEx.ReplaceTextBox(ShortcutKeys, m_tsmiAddGroups, true);
+
+            //m_hkGlobalAutoType.HotKey = (kAT & Keys.KeyCode);
+            //m_hkGlobalAutoType.HotKeyModifiers = (kAT & Keys.Modifiers);
+            //m_hkGlobalAutoType.RenderHotKey();
             
             return true;
         }
