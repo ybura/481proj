@@ -24,6 +24,7 @@ namespace IndiaPlugin
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
+        // On creation of plugin, set-up resources.
         public override bool Initialize(IPluginHost host)
         {
             Terminate();
@@ -59,9 +60,16 @@ namespace IndiaPlugin
             m_tsmiAddGroups.Text = "Speak Selected Entry";
             m_tsmiAddGroups.Click += SpeakSelectedEntry;
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
-
+            
+            // TODO: Set-up hotkey options for plugin.
+            //m_hkGlobalAutoType.HotKey = (kAT & Keys.KeyCode);
+            //m_hkGlobalAutoType.HotKeyModifiers = (kAT & Keys.Modifiers);
+            //m_hkGlobalAutoType.RenderHotKey();
+         
             return true;
         }
+
+        // Destruction of plugin, clean-up resources.
         public override void Terminate()
         {
             if (m_host == null) return;
@@ -70,7 +78,7 @@ namespace IndiaPlugin
 
             m_host = null;
         }
-
+        
         private void SpeakSelectedEntry(object sender, EventArgs e)
         {
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
@@ -86,12 +94,14 @@ namespace IndiaPlugin
                 "m_lvEntries", true)[0] as ListView);
             synthesizer.Speak(lv.SelectedItems[0].Text);
         }
-
+        
+        // Dictates all the items in the password listview.
         private void SpeakEntriesMenuItem(object sender, EventArgs e)
         {
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
             synthesizer.Volume = 100;  // 0...100
             synthesizer.Rate = -2;     // -10...10
+            
             if (!m_host.Database.IsOpen)
             {
                 synthesizer.Speak("You first need to open a database!");
@@ -108,8 +118,10 @@ namespace IndiaPlugin
             }
 
         }
-
+        
         private void SetSelectedEntryType(object sender, EventArgs e)
+        // Dictates the tag for the currently selected entry in the listview.
+        // TODO: Does not work as expected.
         {
             ListView lv = (m_host.MainWindow.Controls.Find(
                 "m_lvEntries", true)[0] as ListView);
@@ -117,6 +129,7 @@ namespace IndiaPlugin
             int index = lv.FocusedItem.Index;
         }
 
+        // UI Refresh callback function.
         private void OnUIStateUpdated(object sender, EventArgs e)
         {
             ListView lv = (m_host.MainWindow.Controls.Find(
