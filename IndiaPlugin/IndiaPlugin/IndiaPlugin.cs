@@ -27,11 +27,10 @@ namespace IndiaPlugin
         public override bool Initialize(IPluginHost host)
         {
             Terminate();
-
             if (host == null) return false;
             m_host = host;
 
-            m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
+// m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
 
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
             synthesizer.Volume = 100;  // 0...100
@@ -39,7 +38,7 @@ namespace IndiaPlugin
             synthesizer.Speak("Hi India.");
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
-
+            
             // Add a separator at the bottom
             m_tsSeparator = new ToolStripSeparator();
             tsMenu.Add(m_tsSeparator);
@@ -54,24 +53,38 @@ namespace IndiaPlugin
             m_tsmiAddGroups.Text = "Listen to Current Entries";
             m_tsmiAddGroups.Click += SpeakEntriesMenuItem;
             m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
-            
-            Container ShortcutKeys = KeysControl | Keys.P;
 
-            m_hk = HotKeyControlEx.ReplaceTextBox(ShortcutKeys, m_tsmiAddGroups, true);
+            // Add menu item 'Add Some Groups'
+            m_tsmiAddGroups = new ToolStripMenuItem();
+            m_tsmiAddGroups.Text = "Speak Selected Entry";
+            m_tsmiAddGroups.Click += SpeakSelectedEntry;
+            m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
 
-            //m_hkGlobalAutoType.HotKey = (kAT & Keys.KeyCode);
-            //m_hkGlobalAutoType.HotKeyModifiers = (kAT & Keys.Modifiers);
-            //m_hkGlobalAutoType.RenderHotKey();
-            
             return true;
         }
         public override void Terminate()
         {
             if (m_host == null) return;
 
-            m_host.MainWindow.UIStateUpdated -= this.OnUIStateUpdated;
+           // m_host.MainWindow.UIStateUpdated -= this.OnUIStateUpdated;
 
             m_host = null;
+        }
+
+        private void SpeakSelectedEntry(object sender, EventArgs e)
+        {
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            synthesizer.Volume = 100;  // 0...100
+            synthesizer.Rate = -2;     // -10...10
+            if (!m_host.Database.IsOpen)
+            {
+                synthesizer.Speak("You first need to open a database!");
+                return;
+            }
+
+            ListView lv = (m_host.MainWindow.Controls.Find(
+                "m_lvEntries", true)[0] as ListView);
+            synthesizer.Speak(lv.SelectedItems[0].Text);
         }
 
         private void SpeakEntriesMenuItem(object sender, EventArgs e)
@@ -95,7 +108,8 @@ namespace IndiaPlugin
             }
 
         }
-        private void SpeakSelectedEntry(object sender, EventArgs e)
+
+        private void SetSelectedEntryType(object sender, EventArgs e)
         {
             ListView lv = (m_host.MainWindow.Controls.Find(
                 "m_lvEntries", true)[0] as ListView);
