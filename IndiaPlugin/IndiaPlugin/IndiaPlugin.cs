@@ -31,7 +31,7 @@ namespace IndiaPlugin
             if (host == null) return false;
             m_host = host;
 
-// m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
+            m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
 
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
             synthesizer.Volume = 100;  // 0...100
@@ -67,18 +67,18 @@ namespace IndiaPlugin
             //m_hkGlobalAutoType.RenderHotKey();
          
             return true;
-        }
+       } 
 
         // Destruction of plugin, clean-up resources.
         public override void Terminate()
         {
             if (m_host == null) return;
 
-           // m_host.MainWindow.UIStateUpdated -= this.OnUIStateUpdated;
+            m_host.MainWindow.UIStateUpdated -= this.OnUIStateUpdated;
 
             m_host = null;
         }
-        
+
         private void SpeakSelectedEntry(object sender, EventArgs e)
         {
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
@@ -136,9 +136,25 @@ namespace IndiaPlugin
                 "m_lvEntries", true)[0] as ListView);
 
             lv.BeginUpdate();
+            /*
             for (int i = 0; i < lv.Items.Count; i++)
             {
                 lv.Items[i].Font = new Font("Arial", 36);
+            }*/
+            for (int i = 0; i < lv.Items.Count; i++)
+            {
+                if (i % 3 == 0)
+                {
+                    lv.Items[i].BackColor = System.Drawing.Color.Red;
+                }
+                else if (i % 3 == 1)
+                {
+                    lv.Items[i].BackColor = System.Drawing.Color.Blue;
+                }
+                else
+                {
+                    lv.Items[i].BackColor = System.Drawing.Color.Yellow;
+                }
             }
             lv.EndUpdate();
         }
