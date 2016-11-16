@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using KeePass.Plugins;
 using KeePassLib;
 using KeePass.UI;
+using KeePass;
 
 namespace IndiaPlugin
 {
@@ -19,7 +20,7 @@ namespace IndiaPlugin
         private ToolStripMenuItem m_tsmiAddGroups = null;
         private ToolStripMenuItem m_tsmiAddEntries = null;
 
-        private HotKeyControlEx m_hk = null;
+        
 
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -32,14 +33,17 @@ namespace IndiaPlugin
             m_host = host;
 
             m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
-
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            synthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult);
             synthesizer.Volume = 100;  // 0...100
-            synthesizer.Rate = -2;     // -10...10
+            synthesizer.Rate = 0;     // -10...10
             synthesizer.Speak("Hi India.");
 
             ToolStripItemCollection tsMenu = m_host.MainWindow.ToolsMenu.DropDownItems;
-            
+
+            m_host.MainWindow.KeyPreview = true;
+            m_host.MainWindow.KeyDown += SpeakSelectedEntry;
+            m_host.MainWindow.KeyDown += SpeakAllEntries;
             // Add a separator at the bottom
             m_tsSeparator = new ToolStripSeparator();
             tsMenu.Add(m_tsSeparator);
@@ -48,24 +52,12 @@ namespace IndiaPlugin
             m_tsmiPopup = new ToolStripMenuItem();
             m_tsmiPopup.Text = "Plugin for India";
             tsMenu.Add(m_tsmiPopup);
-
-            // Add menu item 'Add Some Groups'
-            m_tsmiAddGroups = new ToolStripMenuItem();
-            m_tsmiAddGroups.Text = "Listen to Current Entries";
-            m_tsmiAddGroups.Click += SpeakEntriesMenuItem;
-            m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
-
-            // Add menu item 'Add Some Groups'
-            m_tsmiAddGroups = new ToolStripMenuItem();
-            m_tsmiAddGroups.Text = "Speak Selected Entry";
-            m_tsmiAddGroups.Click += SpeakSelectedEntry;
-            m_tsmiPopup.DropDownItems.Add(m_tsmiAddGroups);
             
             // TODO: Set-up hotkey options for plugin.
             //m_hkGlobalAutoType.HotKey = (kAT & Keys.KeyCode);
             //m_hkGlobalAutoType.HotKeyModifiers = (kAT & Keys.Modifiers);
             //m_hkGlobalAutoType.RenderHotKey();
-         
+           
             return true;
        } 
 
@@ -79,11 +71,12 @@ namespace IndiaPlugin
             m_host = null;
         }
 
-        private void SpeakSelectedEntry(object sender, EventArgs e)
+        private void SpeakSelectedEntry(object sender, KeyEventArgs e)
         {
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            synthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult);
             synthesizer.Volume = 100;  // 0...100
-            synthesizer.Rate = -2;     // -10...10
+            synthesizer.Rate = 0;     // -10...10
             if (!m_host.Database.IsOpen)
             {
                 synthesizer.Speak("You first need to open a database!");
@@ -92,15 +85,51 @@ namespace IndiaPlugin
 
             ListView lv = (m_host.MainWindow.Controls.Find(
                 "m_lvEntries", true)[0] as ListView);
-            synthesizer.Speak(lv.SelectedItems[0].Text);
+            System.Windows.Forms.ListView.SelectedIndexCollection selected_index = lv.SelectedIndices;
+
+            if (e.KeyCode == Keys.Up)
+            {                
+                for (int i = 0; i < lv.Items.Count; i++)
+                {
+                    if (selected_index.Contains(i))
+                    {
+                        if (i - 1 < 0)
+                        {
+                            synthesizer.Speak(lv.SelectedItems[0].Text);
+                        }
+                        else
+                        {
+                            synthesizer.Speak(lv.Items[i - 1].Text);
+                        }
+                    }
+                }
+            }
+            if (e.KeyCode == Keys.Down)
+            {
+                for (int i = 0; i < lv.Items.Count; i++)
+                {
+                    if (selected_index.Contains(i))
+                    {
+                        if (i + 1 >= lv.Items.Count)
+                        {
+                            synthesizer.Speak(lv.SelectedItems[0].Text);
+                        }
+                        else
+                        {
+                            synthesizer.Speak(lv.Items[i + 1].Text);
+                        }
+                    }
+                }
+            }
         }
         
         // Dictates all the items in the password listview.
-        private void SpeakEntriesMenuItem(object sender, EventArgs e)
+        private void SpeakAllEntries(object sender, KeyEventArgs e)
         {
             SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            synthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult);
             synthesizer.Volume = 100;  // 0...100
-            synthesizer.Rate = -2;     // -10...10
+            synthesizer.Rate = 0;     // -10...10
             
             if (!m_host.Database.IsOpen)
             {
@@ -108,17 +137,31 @@ namespace IndiaPlugin
                 return;
             }
 
-            synthesizer.Speak("I am about to tell you the current entries.");
             ListView lv = (m_host.MainWindow.Controls.Find(
                 "m_lvEntries", true)[0] as ListView);
 
-            for (int i = 0; i < lv.Items.Count; i++)
+            if (e.KeyCode == Keys.E && e.Control)
             {
-                synthesizer.Speak(lv.Items[i].Text);
-            }
+                synthesizer.Speak("I am about to tell you the current entries.");
+                for (int i = 0; i < lv.Items.Count; i++)
+                {
+                    synthesizer.Speak(lv.Items[i].Text);
+                }
+            }           
 
         }
         
+        private void OpenURL(object sender, KeyEventArgs e)
+        {
+            ListView lv = (m_host.MainWindow.Controls.Find(
+                "m_lvEntries", true)[0] as ListView);
+
+            if (e.KeyCode == Keys.U && e.Control)
+            {
+                //Open url
+                System.Diagnostics.Process.Start(lv.SelectedItems[3].Text);
+            }
+        }
         private void SetSelectedEntryType(object sender, EventArgs e)
         // Dictates the tag for the currently selected entry in the listview.
         // TODO: Does not work as expected.
@@ -143,19 +186,16 @@ namespace IndiaPlugin
             }*/
             for (int i = 0; i < lv.Items.Count; i++)
             {
-                if (i % 3 == 0)
+                if (i % 2 == 0)
                 {
-                    lv.Items[i].BackColor = System.Drawing.Color.Red;
+                    lv.Items[i].BackColor = System.Drawing.Color.DarkSalmon;
                 }
-                else if (i % 3 == 1)
+                else if (i % 2 == 1)
                 {
                     lv.Items[i].BackColor = System.Drawing.Color.Blue;
                 }
-                else
-                {
-                    lv.Items[i].BackColor = System.Drawing.Color.Yellow;
-                }
             }
+
             lv.EndUpdate();
         }
         
