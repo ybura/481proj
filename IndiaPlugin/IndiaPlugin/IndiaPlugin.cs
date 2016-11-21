@@ -16,11 +16,7 @@ namespace IndiaPlugin
         private IPluginHost m_host = null;
 
         private ToolStripSeparator m_tsSeparator = null;
-        private ToolStripMenuItem m_tsmiPopup = null;
-        private ToolStripMenuItem m_tsmiAddGroups = null;
-        private ToolStripMenuItem m_tsmiAddEntries = null;
-
-        
+        private ToolStripMenuItem m_tsmiPopup = null;        
 
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
@@ -44,6 +40,7 @@ namespace IndiaPlugin
             m_host.MainWindow.KeyPreview = true;
             m_host.MainWindow.KeyDown += SpeakSelectedEntry;
             m_host.MainWindow.KeyDown += SpeakAllEntries;
+            m_host.MainWindow.KeyDown += HelpMenu;
             // Add a separator at the bottom
             m_tsSeparator = new ToolStripSeparator();
             tsMenu.Add(m_tsSeparator);
@@ -69,6 +66,19 @@ namespace IndiaPlugin
             m_host.MainWindow.UIStateUpdated -= this.OnUIStateUpdated;
 
             m_host = null;
+        }
+        
+        private void HelpMenu(object sender, KeyEventArgs e)
+        {
+            SpeechSynthesizer synthesizer = new SpeechSynthesizer();
+            synthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult);
+            synthesizer.Volume = 100;  // 0...100
+            synthesizer.Rate = 0;     // -10...10
+
+            if (e.KeyCode == Keys.H && e.Control)
+            {
+                synthesizer.Speak("These are the keyboard options: press up or down to highlight an entry and have it spoken out, press control E to hear all the entries in the database, press control U to open the URL of the selected entry, press control H to hear this help menu again.");
+            }
         }
 
         private void SpeakSelectedEntry(object sender, KeyEventArgs e)
