@@ -16,14 +16,18 @@ namespace IndiaPlugin
     public sealed class IndiaPluginExt : Plugin
     {
         private IPluginHost m_host = null;
-        private EventHandler<GwmWindowEventArgs> global_window_manager_window_added_handler;
+        private EventHandler<GwmWindowEventArgs> window_event_handler;
         private int tabCount = 0;
         private PwEntryForm form;
         SpeechSynthesizer synthesizer = new SpeechSynthesizer();
         VoiceAge speechAge = VoiceAge.Adult;
         VoiceGender speechGender = VoiceGender.Female;
 
-        bool selected = false;
+        bool at_password = false;
+        bool title_edited = false;
+        bool usr_edited = false;
+        bool url_edited = false;
+
         [DllImport("user32.dll")]
         public static extern int SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
         
@@ -34,8 +38,8 @@ namespace IndiaPlugin
             if (host == null) return false;
             m_host = host;
 
-            global_window_manager_window_added_handler = new EventHandler<GwmWindowEventArgs>(GlobalWindowManager_WindowAdded);
-            GlobalWindowManager.WindowAdded += global_window_manager_window_added_handler;
+            window_event_handler = new EventHandler<GwmWindowEventArgs>(GlobalWindowManager_WindowAdded);
+            GlobalWindowManager.WindowAdded += window_event_handler;
             m_host.MainWindow.UIStateUpdated += this.OnUIStateUpdated;
 
             synthesizer.SelectVoiceByHints(speechGender, speechAge);
@@ -69,7 +73,8 @@ namespace IndiaPlugin
             m_host.MainWindow.KeyDown -= CustomizeVoice;
             m_host.MainWindow.KeyDown -= SelectFemaleVoice;
             m_host.MainWindow.KeyDown -= SelectMaleVoice;
-            GlobalWindowManager.WindowAdded -= global_window_manager_window_added_handler;
+
+            GlobalWindowManager.WindowAdded -= window_event_handler;
             m_host = null;
         }
 
@@ -84,10 +89,59 @@ namespace IndiaPlugin
             if (form== null)
                 return;
 
+            at_password = false;
+            synthesizer.SpeakAsync("Type in the title of your entry then press control N to continue. Press control H to hear instructions to add an entry.");
             form.KeyPreview = true;
             form.KeyDown += KillSpeech;
             form.KeyDown += SpeakAddEntryMenu;
             form.KeyDown += AddHelpMenu;
+            form.KeyDown += FixAddEntryMenu;
+        }
+
+        private void FixAddEntryMenu(object sender, KeyEventArgs e)
+        {
+            synthesizer.SelectVoiceByHints(speechGender, speechAge);
+            synthesizer.Volume = 100;  // 0...100
+            synthesizer.Rate = 0;     // -10...10
+
+            TextBox m_tbUserName = (form.Controls.Find("m_tbUserName", true)[0] as TextBox);
+            TextBox m_tbUrl = (form.Controls.Find("m_tbUrl", true)[0] as TextBox);
+            TextBox m_tbTitle = (form.Controls.Find("m_tbTitle", true)[0] as TextBox);
+            RichTextBox m_rtNotes = (form.Controls.Find("m_rtNotes", true)[0] as RichTextBox);
+            Button m_btnOk = (form.Controls.Find("m_btnOk", true)[0] as Button);
+
+            if (e.KeyCode == Keys.R && e.Control)
+            {
+                if (!title_edited)
+                {
+                    title_edited = true;
+                    m_tbTitle.Focus();
+                    m_tbTitle.SelectAll();
+                    string to_speak = String.Format("This is your current title {0}. Type in your new title then press control N", m_tbTitle.Text);
+                    synthesizer.SpeakAsync(to_speak);
+                    return;
+                }
+
+                if (usr_edited)
+                {
+                    usr_edited = true;
+                    m_tbUserName.Focus();
+                    m_tbUserName.SelectAll();
+                    string to_speak = String.Format("This is your current username {0}. Type in your new username then press control N", m_tbUserName.Text);
+                    synthesizer.SpeakAsync(to_speak);
+                    return;
+                }
+
+                if (url_edited)
+                {
+                    url_edited = true;
+                    m_tbUrl.Focus();
+                    m_tbUrl.SelectAll();
+                    string to_speak = String.Format("This is your current url {0}. Type in your new url then press control N", m_tbTitle.Text);
+                    synthesizer.SpeakAsync(to_speak);
+                    return;
+                }                
+            }
         }
         
         private void SpeakAddEntryMenu(object sender, KeyEventArgs e)
@@ -99,8 +153,11 @@ namespace IndiaPlugin
             TextBox m_tbUserName = (form.Controls.Find("m_tbUserName", true)[0] as TextBox);
             TextBox m_tbUrl= (form.Controls.Find("m_tbUrl", true)[0] as TextBox);
             TextBox m_tbTitle = (form.Controls.Find("m_tbTitle", true)[0] as TextBox);
+            TextBox m_tbPassword = (form.Controls.Find("m_tbPassword", true)[0] as TextBox);
             RichTextBox m_rtNotes = (form.Controls.Find("m_rtNotes", true)[0] as RichTextBox);
             Button m_btnOk = (form.Controls.Find("m_btnOk", true)[0] as Button);
+            CheckBox m_cbPassword = (form.Controls.Find("m_cbHidePassword", true)[0] as CheckBox);
+            
 
             if (e.KeyCode == Keys.N && e.Control)
             {
@@ -110,6 +167,11 @@ namespace IndiaPlugin
                     synthesizer.SpeakAsync("Type in the title of the entry then press control N ");
                     return;
                 }
+                else
+                {
+                    string to_speak = String.Format("The title you typed in is {0}", m_tbTitle.Text);
+                    synthesizer.SpeakAsync(to_speak);
+                }
 
                 if (string.IsNullOrWhiteSpace(m_tbUserName.Text))
                 {
@@ -117,12 +179,33 @@ namespace IndiaPlugin
                     synthesizer.SpeakAsync("Type in your username then press control N");
                     return;
                 }
+                else
+                {
+                    string to_speak = String.Format("The username you typed in is {0}", m_tbUserName.Text);
+                    synthesizer.SpeakAsync(to_speak);
+                }
+
+                if (!at_password)
+                {
+                    at_password = true;
+                    m_tbPassword.Focus();
+                    m_tbPassword.ReadOnly = true;
+                    m_cbPassword.Checked = false;
+                    synthesizer.SpeakAsync("Press control c to copy the password then paste it into the password field on the website this account is for, then press control n twice to go to the next textbox.");
+                    return;
+                }
 
                 if (string.IsNullOrWhiteSpace(m_tbUrl.Text))
                 {
                     m_tbUrl.Focus();
+                    m_cbPassword.Checked = true;
                     synthesizer.SpeakAsync("Type in the url of the website then press control N. Make sure the url is in the form of www.URL.com");
                     return;
+                }
+                else
+                {
+                    string to_speak = String.Format("The url you typed in is {0}", m_tbUrl.Text);
+                    synthesizer.SpeakAsync(to_speak);
                 }
 
                 if (string.IsNullOrWhiteSpace(m_rtNotes.Text) && tabCount < 1)
@@ -150,7 +233,7 @@ namespace IndiaPlugin
 
             if (e.KeyCode == Keys.H && e.Control)
             {
-                synthesizer.SpeakAsync("This is the field to add a new account entry. You need to have the title, username, and url form fields filled in before you can finish adding the entry. Press control N to hear which entry you need to add.");
+                synthesizer.SpeakAsync("This is the field to add a new account entry. You need to have the title, username, and url form fields filled in before you can finish adding the entry. Press control N to hear which entry you need to add, and press control J to edit the entry you most recently added.");
             }
         }
 
@@ -162,7 +245,7 @@ namespace IndiaPlugin
 
             if (e.KeyCode == Keys.M && e.Control)
             {
-                synthesizer.SpeakAsync("These are the keyboard options: press up or down to highlight an entry and have it spoken out, press control E to hear all the entries in the database, press control I to add a new entry, press control U to open the URL of the selected entry,press control H to hear this help menu again.");
+                synthesizer.SpeakAsync("These are the keyboard options: press up or down to highlight an entry and have it spoken out, press control E to hear all the entries in the database, press control I to add a new entry, press control U to open the URL of the selected entry, press control Z to change my voice, press control M to hear this help menu again.");
             }
         }
 
